@@ -12,6 +12,8 @@ import webpackDevMiddleware from 'webpack-dev-middleware';
 import webpackHotMiddleware from 'webpack-hot-middleware';
 import config from '../webpack.config.dev';
 
+import { router } from '../server/serviceLayer/service';
+
 let app = express();
 const bundler = webpack(config);
 const middleware = webpackDevMiddleware(bundler, {
@@ -30,6 +32,7 @@ const middleware = webpackDevMiddleware(bundler, {
 });
 
 app.use(bodyParser.json());
+app.use('/', router);
 // Run express and use middleware for Hot Module Replacement
 app.use(historyApiFallback(__dirname + '../src/index.html'));
 app.use(middleware);
