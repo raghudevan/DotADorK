@@ -1,48 +1,54 @@
 // This file configures the development web server
 // which supports hot reloading and synchronized testing.
 
-// Require Browsersync along with webpack and middleware for it
-import browserSync from 'browser-sync';
+import express from 'express';
+import path from 'path';
+import bodyParser from 'body-parser';
 // Required for react-router browserHistory
 // see https://github.com/BrowserSync/browser-sync/issues/204#issuecomment-102623643
-import historyApiFallback from 'connect-history-api-fallback';
+import historyApiFallback from 'express-history-api-fallback';
 import webpack from 'webpack';
 import webpackDevMiddleware from 'webpack-dev-middleware';
 import webpackHotMiddleware from 'webpack-hot-middleware';
 import config from '../webpack.config.dev';
 
+let app = express();
 const bundler = webpack(config);
+const middleware = webpackDevMiddleware(bundler, {
 
-// Run Browsersync and use middleware for Hot Module Replacement
-browserSync({
-  server: {
-    baseDir: 'src',
+  // Dev middleware can't access config, so we provide publicPath
+  publicPath: config.output.publicPath,
 
-    middleware: [
-      webpackDevMiddleware(bundler, {
-        // Dev middleware can't access config, so we provide publicPath
-        publicPath: config.output.publicPath,
+  // pretty colored output
+  stats: { colors: true },
 
-        // pretty colored output
-        stats: { colors: true },
+  // Set to false to display a list of each file that is being bundled.
+  noInfo: true
 
-        // Set to false to display a list of each file that is being bundled.
-        noInfo: true
+  // for other settings see
+  // http://webpack.github.io/docs/webpack-dev-middleware.html
+});
 
-        // for other settings see
-        // http://webpack.github.io/docs/webpack-dev-middleware.html
-      }),
+app.use(bodyParser.json());
+// Run express and use middleware for Hot Module Replacement
+app.use(historyApiFallback(__dirname + '../src/index.html'));
+app.use(middleware);
+app.use(webpackHotMiddleware(bundler));
 
-      // bundler should be the same as above
-      webpackHotMiddleware(bundler),
+app.get('/', function(req, res, next) {
+  if(req.url == "/") {
+    res.sendFile(path.join(__dirname, '../src/index.html'));
+    return;
+  }
 
-      historyApiFallback()
-    ]
-  },
+  next();
+});
 
-  // no need to watch '*.js' here, webpack will take care of it for us,
-  // including full page reloads if HMR won't work
-  files: [
-    'src/*.html'
-  ]
+// let server = 
+app.listen(3000, function(err) {
+  if(err) {
+    return;
+  }
+
+  console.log("Server started on: http://localhost:3000"); //eslint-disable-line no-console
 });

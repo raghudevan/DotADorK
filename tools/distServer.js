@@ -1,22 +1,22 @@
 // This file configures a web server for testing the production build
 // on your local machine.
 
-import browserSync from 'browser-sync';
-import historyApiFallback from 'connect-history-api-fallback';
+import express from 'express';
+import bodyParser from 'body-parser';
+import historyApiFallback from 'express-history-api-fallback';
 
-// Run Browsersync
-browserSync({
-  port: 3000,
-  ui: {
-    port: 3001
-  },
-  server: {
-    baseDir: 'dist'
-  },
+let app = express();
 
-  files: [
-    'src/*.html'
-  ],
+app.use(bodyParser.json());
+// Run express and use middleware for Hot Module Replacement
+app.use(historyApiFallback(__dirname + '../dist/index.html'));
+app.use(express.static(process.cwd() + '/dist'));
 
-  middleware: [historyApiFallback()]
+// let server = 
+app.listen(3000, function(err) {
+  if(err) {
+    return;
+  }
+
+  console.log("Server started on: http://localhost:3000"); //eslint-disable-line no-console
 });

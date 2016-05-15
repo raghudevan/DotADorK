@@ -13,9 +13,9 @@ class FirstPage extends Component {
 	render() {
 		return (
 			<div>
+				Input Text: {this.props.text} <br/>
 				<input ref="inputval" type="text" placeholder="say something"
 				 onChange={this.onChange}/>
-				 Input: {this.props.text}
 			</div>
 		);
 	}
@@ -23,8 +23,8 @@ class FirstPage extends Component {
 
 /* Component properties */
 FirstPage.propTypes = {
-	text: React.PropTypes.object.isRequired,
-	setText: React.PropTypes.object.isRequired
+	text: React.PropTypes.string.isRequired,
+	setText: React.PropTypes.func.isRequired
 }
 
 /* Maps state to props */
