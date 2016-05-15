@@ -2,12 +2,14 @@
 // This boilerplate file is likely to be the same for each project that uses Redux.
 // With Redux, the actual stores are in /reducers.
 
-import { createStore, compose } from 'redux';
+import { /*applyMiddleware,*/ createStore, compose } from 'redux';
 import rootReducer from '../reducers';
+// import socketMiddleware from '../middleware/socketmiddleware';
 
 export default function configureStore(initialState) {
   const store = createStore(rootReducer, initialState, compose(
     // Add other middleware on this line...
+    // applyMiddleware(socketMiddleware),
     window.devToolsExtension ? window.devToolsExtension() : f => f // add support for Redux dev tools
     )
   );
