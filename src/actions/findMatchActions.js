@@ -1,4 +1,4 @@
-let url = "http://localhost:3000/testGET?param=1";
+let url = "http://107.170.0.74:3000/testGET?param=1";
 
 export function findMatch() {
 	return dispatch => {
