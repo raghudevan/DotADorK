@@ -1,12 +1,15 @@
 let initialState = {
-	response: "no reponse yet..."
+	isConnected: false,
+	userName: ""
 }
 
 export default function findMatchState(state = initialState, action) {
 	switch(action.type) {
-		case "FIND_MATCH_FULFILLED":
+		case "SET_SOCKET": 
 		{
-			return Object.assign({}, state, { response: action.payload.response });
+			// if this is happening, that means user is connected
+			// to the socket
+			return Object.assign({}, state, { isConnected: true, userName: action.userName });
 		}
 		default:
 		{

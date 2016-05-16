@@ -13,6 +13,7 @@ import webpackHotMiddleware from 'webpack-hot-middleware';
 import config from '../webpack.config.dev';
 
 import { router } from '../server/serviceLayer/service';
+import initSocketServer from '../server/serviceLayer/socketservices';
 
 let app = express();
 const bundler = webpack(config);
@@ -47,11 +48,12 @@ app.get('/', function(req, res, next) {
   next();
 });
 
-// let server = 
+let server = 
 app.listen(3000, function(err) {
   if(err) {
     return;
   }
 
+  initSocketServer(server);
   console.log("Server started on: http://localhost:3000"); //eslint-disable-line no-console
 });

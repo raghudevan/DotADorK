@@ -3,19 +3,74 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { toJS } from 'immutable'
 import * as findMatchActions from '../actions/findMatchActions';
+import io from 'socket.io-client';
 
 class FindMatch extends React.Component{
 
-	onClick = () => {
-		this.props.findMatch();
+	doConnect = () => {
+		if(this.refs.playername.value !== "") {
+			this.socket = io("http://localhost:3000", { query: { name: this.refs.playername.value } });
+			this.socket.on('state', (chatState) => {
+				console.log('got state');
+				this.props.setChat(chatState);
+				if(this.props.userName === "") {
+					// this is bad - should not broadcast back to owner sometimes
+					this.props.setSocket(this.socket, this.refs.playername.value);
+				}
+			});
+		} else {
+			//notify?
+		}
+	}
+
+	sendMessage = () => {
+		this.props.sendMessage(this.refs.message.value, this.props.userName);
+		this.refs.message.value = "";
 	}
 
 	render() {
+		console.log('isConnected?', this.props.isConnected);
 		return (
 			<div>
-				Player Name: <input type="text"/> <br/>
-				<button onClick={this.onClick}>Find Match</button>
-				Response: {this.props.response}
+				{
+					!this.props.isConnected ? 
+					<div>
+						Player Name: <input ref="playername" type="text"/> <br/>
+						<button onClick={this.doConnect}>Connect</button>
+					</div> :
+					<div>
+						<div style={{float: "left"}}>
+							Currently in chat:
+							<ul>
+							{
+								this.props.usersConnected.map((item, index) => {
+									return(
+										<li key={index}>
+											{item}
+										</li>
+									);
+								})
+							}
+							</ul>
+						</div>
+						<div style={{marginLeft: "150"}} ref="chat-div">
+							Connected as: {this.props.userName}
+							<ul>
+								{
+									this.props.chat.map((item, index) => {
+										return(
+											<li key={index}>
+												{item.userName}: {item.message}
+											</li>
+										);
+									})
+								}
+							</ul>
+							<textarea ref="message"/>
+							<button onClick={this.sendMessage}>Send</button>
+						</div>
+					</div>
+				}
 			</div>
 		);
 	}
@@ -23,14 +78,17 @@ class FindMatch extends React.Component{
 
 /* Component properties */
 FindMatch.propTypes = {
-	response: React.PropTypes.string.isRequired,
-	findMatch: React.PropTypes.func.isRequired
+	findMatch: React.PropTypes.func.isRequired,
+	setChat: React.PropTypes.func.isRequired
 }
 
 /* Maps state to props */
 function mapStateToProps(state) {
 	return {
-		response: state.findMatchState.response
+		isConnected: state.findMatchState.isConnected,
+		userName: state.findMatchState.userName,
+		chat: state.chatState.chat,
+		usersConnected: state.chatState.usersConnected
 	};
 }
 

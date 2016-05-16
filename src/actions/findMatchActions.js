@@ -1,5 +1,18 @@
 let url = "http://107.170.0.74:3000/testGET?param=1";
 
+export function setChat(chatState) {
+	return { type: "SET_STATE", chatState };
+}
+
+export function setSocket(socket, userName) {
+	// only for the purpose of the socketmiddleware
+	return { type: "SET_SOCKET", meta: { remote: true }, socket, userName };
+}
+
+export function sendMessage(message, userName) {
+	return { type: "SEND_MESSAGE", meta: { remote: true }, message, userName };
+}
+
 export function findMatch() {
 	return dispatch => {
 		return dispatch({
@@ -11,7 +24,7 @@ export function findMatch() {
 	};
 }
 
-function post(urlpath,body) {
+function post(urlpath, body) {
   	return request(
   		urlpath,
   		Object.assign({}, defaultOptions, { method: 'POST', body: JSON.stringify(body) })
