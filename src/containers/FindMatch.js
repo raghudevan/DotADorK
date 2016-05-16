@@ -1,11 +1,11 @@
-import React from 'react';
+import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { toJS } from 'immutable'
 import * as findMatchActions from '../actions/findMatchActions';
 import io from 'socket.io-client';
 
-class FindMatch extends React.Component{
+class FindMatch extends Component {
 
 	doConnect = () => {
 		if(this.refs.playername.value !== "") {

@@ -6,7 +6,7 @@ export function setChat(chatState) {
 
 export function setSocket(socket, userName) {
 	// only for the purpose of the socketmiddleware
-	return { type: "SET_SOCKET", meta: { remote: true }, socket, userName };
+	return { type: "SET_SOCKET", socket, userName };
 }
 
 export function sendMessage(message, userName) {

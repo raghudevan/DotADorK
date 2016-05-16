@@ -15,8 +15,8 @@ function startSocketServer(server, store) {
 		next();
 	});
 
-	store.subscribe((a) => {
-		console.log('post subscribing', a);
+	store.subscribe(() => {
+		console.log('post subscribing');
 		// publish to everyone when some change happens
 		io.emit('state', store.getState().chatState);
 	});

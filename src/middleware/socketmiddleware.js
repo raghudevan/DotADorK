@@ -2,13 +2,10 @@
 let socket;
 export default store => next => action => {
 	if(action.meta) {
-		if(action.type === "SET_SOCKET") {
-			// set the socket for future use
-			socket = action.socket;
-		} else {
-			socket.emit('action', action);
-		}
+		socket.emit('action', action);
+	} else {
+		// set the socket for future use
+		socket = action.socket;
+		next(action);
 	}
-
-	next(action);
 };
