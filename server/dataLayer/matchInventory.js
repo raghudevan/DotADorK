@@ -81,5 +81,6 @@ function connect(mongoUrl, cb) {
 
 createOrJoinMatch("HavaH123", function(res) {
 	console.log(res);
+	dbCon.close();
 	return;
 });
