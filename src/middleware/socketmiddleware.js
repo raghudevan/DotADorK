@@ -5,7 +5,9 @@ export default store => next => action => {
 		socket.emit('action', action);
 	} else {
 		// set the socket for future use
-		socket = action.socket;
+		if(action.type === "SET_SOCKET") {
+			socket = action.socket;
+		}
 		next(action);
 	}
 };

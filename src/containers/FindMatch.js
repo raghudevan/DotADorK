@@ -9,7 +9,8 @@ class FindMatch extends Component {
 
 	doConnect = () => {
 		if(this.refs.playername.value !== "") {
-			this.socket = io("http://localhost:3000", { query: { name: this.refs.playername.value } });
+			let uri = window.location.protocol + "//" + window.location.hostname + ":" + window.location.port;
+			this.socket = io(uri, { query: { name: this.refs.playername.value } });
 			this.socket.on('state', (chatState) => {
 				console.log('got state');
 				this.props.setChat(chatState);
@@ -53,7 +54,7 @@ class FindMatch extends Component {
 							}
 							</ul>
 						</div>
-						<div style={{marginLeft: "150"}} ref="chat-div">
+						<div style={{marginLeft: "150px"}} ref="chat-div">
 							Connected as: {this.props.userName}
 							<ul>
 								{
