@@ -30,13 +30,18 @@ class FindMatch extends Component {
 			console.log("playername: "+playername);
 			baseURL.then(url => {
 				this.socket = io(url, { query: { name: playername } });
-				this.socket.on('state', (chatState) => {
-					console.log('got state');
+				this.socket.on('FULL', (chatState) => {
+					console.log('FULL');
 					this.props.setChat(chatState);
 					if(this.props.userName === "") {
 						this.props.setSocket(this.socket, playername );
 					}
 				});
+
+				this.socket.on("ROOM", (state) => {
+					console.log("ROOM", state);
+					this.props.updateRoomInfo(state);
+				})
 			});
 		} else {
 			//notify?
@@ -61,15 +66,15 @@ class FindMatch extends Component {
 					<div>
 						<UsersList label="Currently in chat:" 
 						style={{float: "left"}} 
-						connectedUsers={this.props.connectedUsers}/>
+						connectedUsers={this.props.roomUsers}/>
 						<div style={{marginLeft: "150px"}} ref="chat-div">
-							Connected as: {this.props.userName}
+							Connected as: {this.props.userName} | Room ID: {this.props.roomId}
 							<ul ref="chat"
 							style={{minHeight: "200px", maxHeight: "200px", 
 							overflow: "auto", overflowX: "hidden", overflowY: "hidden",
 							width: "400px"}}>
 							{
-								this.props.chat.map((item, index) => {
+								this.props.roomChat.map((item, index) => {
 									return(
 										<li key={index}>
 											{item.userName}: {item.message}
@@ -95,7 +100,10 @@ FindMatch.propTypes = {
 	isConnected: React.PropTypes.bool.isRequired,
 	userName: React.PropTypes.string.isRequired,
 	chat: React.PropTypes.array.isRequired,
+	roomChat: React.PropTypes.array.isRequired,
 	connectedUsers: React.PropTypes.array.isRequired,
+	roomUsers: React.PropTypes.array.isRequired,
+	roomId: React.PropTypes.string.isRequired,
 	findMatch: React.PropTypes.func.isRequired,
 	setChat: React.PropTypes.func.isRequired
 }
@@ -106,7 +114,10 @@ function mapStateToProps(state) {
 		isConnected: state.findMatchState.isConnected,
 		userName: state.findMatchState.userName,
 		chat: state.chatState.chat,
-		connectedUsers: state.chatState.connectedUsers
+		roomChat: state.chatState.roomChat,
+		connectedUsers: state.chatState.connectedUsers,
+		roomUsers: state.chatState.roomUsers,
+		roomId: state.chatState.roomId
 	};
 }
 

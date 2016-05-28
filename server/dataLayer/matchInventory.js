@@ -141,4 +141,3 @@ export function createOrJoinMatch(playerId, cb) {
 createOrJoinMatch("12344", function( res ) {
 	console.log(JSON.stringify(res));
 });*/
-

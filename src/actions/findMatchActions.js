@@ -1,5 +1,9 @@
 import { get } from '../utils/api';
 
+export function updateRoomInfo(state) {
+	return { type: "SET_ROOM", roomId: state.matchId, roomUsers: state.users, roomChat: state.chat };
+}
+
 export function setChat(chatState) {
 	return { type: "SET_STATE", chatState };
 }
@@ -16,8 +20,8 @@ export function sendMessage(message, userName) {
 // used only on the server to add new users
 // to the server side state. This is then emited
 // to all connected clients
-export function addUser(username, socketId) {
-	return { type: "ADD_USER", username, socketId };
+export function addUser(username, socket) {
+	return { type: "ADD_USER", username, socket };
 }
 
 export function removeUser(socketId) {

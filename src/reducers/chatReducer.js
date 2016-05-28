@@ -1,6 +1,10 @@
 let initialState = {
+	roomId: "",
+	roomUsers: [],
+	roomChat: [],
 	socketNameMap: {}, // { socket:userName }
-	connectedUsers: [],
+	connectedUsers: [], // {username, socketid}
+	rooms: {}, // { roomId: {users: [], chat: []} }
 	chat: [] // [{ userName, message }]
 }
 
@@ -9,6 +13,10 @@ export default function chatState(state = initialState, action) {
 		case "SET_STATE":
 		{
 			return Object.assign({}, state, action.chatState);
+		}
+		case "SET_ROOM":
+		{
+			return Object.assign({}, state, { roomId: action.roomId, roomUsers: action.roomUsers, roomChat: action.roomChat });
 		}
 		case "SEND_MESSAGE":
 		{
@@ -23,8 +31,7 @@ export default function chatState(state = initialState, action) {
 		{
 			// this is used only on the server
 			let newUser = {};
-			console.log("action.username: "+action.username+"\t action.socketId: "+action.socketId);
-			newUser[action.socketId] = action.username;
+			newUser[action.socket.id] = action.username;
 
 			// the socketNameMap will be sent to every client. 
 			// Should prolly keep it on the server side only
@@ -64,6 +71,23 @@ export default function chatState(state = initialState, action) {
 		{	
 			// good place to set some err flag or w/e
 			return state;
+		}
+		case "MAKE_NEW_ROOM":
+		{
+			console.log("MAKING NEW ROOM");
+			let newRoom = {};
+			newRoom[action.matchId] = { users: [state.socketNameMap[action.socketId]], chat: [] };
+			console.log('newRoom', newRoom, state.socketNameMap);
+			return Object.assign({}, state, { rooms: Object.assign({}, state.rooms, newRoom) });
+		}
+		case "ADD_USER_TO_ROOM":
+		{
+			let newUsers = state.rooms[action.matchId].users.concat([state.socketNameMap[action.socketId]]);
+			let chat = state.rooms[action.matchId].chat.concat([]);
+			
+			let newRoom = {};
+			newRoom[action.matchId] = { users: newUsers, chat: chat };
+			return Object.assign({}, state, { rooms: Object.assign({}, state.rooms, newRoom) });
 		}
 		default:
 		{
