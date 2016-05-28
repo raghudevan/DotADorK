@@ -65,7 +65,8 @@ class FindMatch extends Component {
 							Connected as: {this.props.userName}
 							<ul ref="chat"
 							style={{minHeight: "200px", maxHeight: "200px", 
-							overflow: "auto", width: "400px"}}>
+							overflow: "auto", overflowX: "hidden", overflowY: "hidden",
+							width: "400px"}}>
 							{
 								this.props.chat.map((item, index) => {
 									return(
