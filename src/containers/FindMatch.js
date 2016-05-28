@@ -13,6 +13,12 @@ class FindMatch extends Component {
 		this.props.getConnectedUsers();
 	}
 
+	componentDidUpdate = () => {
+		if(this.refs.chat) {
+			this.refs.chat.scrollTop = this.refs.chat.scrollHeight;
+		}
+	}
+
 	onKeyUp = (e) => {
 		if(e.which === 13 && !e.shiftKey) {
 			this.sendMessage();
@@ -42,7 +48,6 @@ class FindMatch extends Component {
 	}
 
 	render() {
-		console.log('isConnected?', this.props.isConnected);
 		return (
 			<div>
 				{
@@ -60,7 +65,7 @@ class FindMatch extends Component {
 							Connected as: {this.props.userName}
 							<ul ref="chat"
 							style={{minHeight: "200px", maxHeight: "200px", 
-							overflow: "auto"}}>
+							overflow: "auto", width: "400px"}}>
 							{
 								this.props.chat.map((item, index) => {
 									return(
@@ -71,7 +76,7 @@ class FindMatch extends Component {
 								})
 							}
 							</ul>
-							<textarea style={{resize: "none"}}
+							<textarea style={{width: "400px", resize: "none"}}
 							onKeyUp={this.onKeyUp} ref="message"
 							placeholder="Say something!"/>
 						</div>
