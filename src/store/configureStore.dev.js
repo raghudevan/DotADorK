@@ -8,8 +8,9 @@ import socketMiddleware from '../middleware/socketmiddleware';
 import promiseMiddleware from 'redux-promise-middleware';
 import thunkMiddleware from 'redux-thunk';
 
+let store;
 export default function configureStore(initialState) {
-  const store = createStore(rootReducer, initialState, compose(
+  store = createStore(rootReducer, initialState, compose(
     // Add other middleware on this line...
     applyMiddleware(socketMiddleware, thunkMiddleware, promiseMiddleware()),
     window.devToolsExtension ? window.devToolsExtension() : f => f // add support for Redux dev tools
@@ -25,4 +26,8 @@ export default function configureStore(initialState) {
   }
 
   return store;
+}
+
+export function getState() {
+  return store.getState();
 }

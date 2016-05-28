@@ -10,7 +10,7 @@ import NotFoundPage from './components/NotFoundPage.js';
 
 export default (
   <Route path="/" component={App}>
-    <IndexRoute component={HomePage}/>
+    <IndexRoute component={FindMatch}/>
     <Route path="first-page" component={FirstPage}/>
     <Route path="find-match" component={FindMatch}/>
     <Route path="about" component={AboutPage}/>
