@@ -3,7 +3,7 @@ import React from 'react';
 class PlayerConnect extends React.Component {
 	onKeyUp = (e) => {
 		if(e.which === 13) {
-			onClick();
+			this.onClick();
 		}
 	}
 

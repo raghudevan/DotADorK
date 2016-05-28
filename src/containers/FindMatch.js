@@ -79,6 +79,7 @@ class FindMatch extends Component {
 							}
 							</ul>
 							<textarea style={{width: "400px", resize: "none"}}
+							autoFocus
 							onKeyUp={this.onKeyUp} ref="message"
 							placeholder="Say something!"/>
 						</div>
