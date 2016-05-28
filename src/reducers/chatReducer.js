@@ -23,6 +23,7 @@ export default function chatState(state = initialState, action) {
 		{
 			// this is used only on the server
 			let newUser = {};
+			console.log("action.username: "+action.username+"\t action.socketId: "+action.socketId);
 			newUser[action.socketId] = action.username;
 
 			// the socketNameMap will be sent to every client. 
@@ -56,6 +57,7 @@ export default function chatState(state = initialState, action) {
 		}
 		case "GET_CONNECTED_USERS_FULFILLED": 
 		{
+			console.log("action.payload.connectedUsers : "+action.payload.connectedUsers);
 			return Object.assign({}, state, { connectedUsers: action.payload.connectedUsers });
 		}
 		case "GET_CONNECTED_USERS_REJECTED": 

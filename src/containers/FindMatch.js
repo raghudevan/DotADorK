@@ -27,6 +27,7 @@ class FindMatch extends Component {
 
 	doConnect = (playername) => {
 		if(playername !== "") {
+			console.log("playername: "+playername);
 			baseURL.then(url => {
 				this.socket = io(url, { query: { name: playername } });
 				this.socket.on('state', (chatState) => {

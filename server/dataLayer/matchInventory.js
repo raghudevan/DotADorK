@@ -42,31 +42,6 @@ function updateMatch(matchId, match, cb) {
     });
 }
 
-function createOrJoinMatch(playerId, cb) {
-	console.log("In createOrJoinMatch");
-	connect(DBUrl, function(res) {
-		if(res.success === true) {
-			dbCon=res.dbHandle;
-			getNextUnfilledMatch(function(match){
-				if(match === null) {
-					createMatch(playerId, function( res ) {
-						dbCon.close();
-						return cb(res);
-					});
-				}
-				else {
-					joinMatch(match, playerId, function( res ) {
-						dbCon.close();
-						return cb(res);
-					});
-				}
-			});
-		}
-		else {
-			return cb(res);
-		}
-	});
-}
 
 function getNextUnfilledMatch(cb) {
 	console.log("In getNextUnfilledMatch");
@@ -135,10 +110,35 @@ function connect(mongoUrl, cb) {
 	});
 }
 
+
+export function createOrJoinMatch(playerId, cb) {
+	console.log("In createOrJoinMatch");
+	connect(DBUrl, function(res) {
+		if(res.success === true) {
+			dbCon=res.dbHandle;
+			getNextUnfilledMatch(function(match){
+				if(match === null) {
+					createMatch(playerId, function( res ) {
+						dbCon.close();
+						return cb(res);
+					});
+				}
+				else {
+					joinMatch(match, playerId, function( res ) {
+						dbCon.close();
+						return cb(res);
+					});
+				}
+			});
+		}
+		else {
+			return cb(res);
+		}
+	});
+}
+
 /*
 createOrJoinMatch("12344", function( res ) {
 	console.log(JSON.stringify(res));
 });*/
-
-exports.createOrJoinMatch=createOrJoinMatch;
 
