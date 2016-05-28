@@ -1,7 +1,12 @@
 import { createStore } from 'redux';
 import rootReducer from '../reducers';
 
+let store;
 export default function makeStoreForServer() {
-	const store = createStore(rootReducer);
+	store = createStore(rootReducer);
 	return store;
+}
+
+export function getState() {
+	return store.getState();
 }

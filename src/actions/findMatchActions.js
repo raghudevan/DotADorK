@@ -1,4 +1,4 @@
-let url = "http://107.170.0.74:3000/testGET?param=1";
+import { get } from '../utils/api';
 
 export function setChat(chatState) {
 	return { type: "SET_STATE", chatState };
@@ -13,6 +13,23 @@ export function sendMessage(message, userName) {
 	return { type: "SEND_MESSAGE", meta: { remote: true }, message, userName };
 }
 
+// used only on the server to add new users
+// to the server side state. This is then emited
+// to all connected clients
+export function addUser(username, socketId) {
+	return { type: "ADD_USER", username, socketId };
+}
+
+export function removeUser(socketId) {
+	return { type: "REMOVE_USER", socketId };
+}
+
+export function getConnectedUsers() {
+	return dispatch => {
+		get(dispatch, "GET_CONNECTED_USERS");
+	}
+}
+
 export function findMatch() {
 	return dispatch => {
 		return dispatch({
@@ -22,24 +39,4 @@ export function findMatch() {
 				// callback(); // on error?
 			});
 	};
-}
-
-function post(urlpath, body) {
-  	return request(
-  		urlpath,
-  		Object.assign({}, defaultOptions, { method: 'POST', body: JSON.stringify(body) })
-	);
-}	
-
-function get(urlpath) {
-	return request(
-		urlpath,
-	 	{ method: 'GET' }
- 	);
-}	
-
-function request(url, options) {
-	return Promise.resolve(fetch(url,options).then(response => {
-		return response.json();
-	}));
 }

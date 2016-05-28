@@ -1,23 +1,35 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import { toJS } from 'immutable'
-import * as findMatchActions from '../actions/findMatchActions';
 import io from 'socket.io-client';
+import * as findMatchActions from '../actions/findMatchActions';
+import PlayerConnect from '../components/PlayerConnect';
+import UsersList from '../components/UsersList';
+import { baseURL } from '../utils/api'; 
 
 class FindMatch extends Component {
 
-	doConnect = () => {
-		if(this.refs.playername.value !== "") {
-			let uri = window.location.protocol + "//" + window.location.hostname + ":" + window.location.port;
-			this.socket = io(uri, { query: { name: this.refs.playername.value } });
-			this.socket.on('state', (chatState) => {
-				console.log('got state');
-				this.props.setChat(chatState);
-				if(this.props.userName === "") {
-					// this is bad - should not broadcast back to owner sometimes
-					this.props.setSocket(this.socket, this.refs.playername.value);
-				}
+	componentDidMount = () => {
+		this.props.getConnectedUsers();
+	}
+
+	onKeyUp = (e) => {
+		if(e.which === 13 && !e.shiftKey) {
+			this.sendMessage();
+		}
+	}
+
+	doConnect = (playername) => {
+		if(playername !== "") {
+			baseURL.then(url => {
+				this.socket = io(url, { query: { name: playername } });
+				this.socket.on('state', (chatState) => {
+					console.log('got state');
+					this.props.setChat(chatState);
+					if(this.props.userName === "") {
+						this.props.setSocket(this.socket, playername );
+					}
+				});
 			});
 		} else {
 			//notify?
@@ -36,39 +48,32 @@ class FindMatch extends Component {
 				{
 					!this.props.isConnected ? 
 					<div>
-						Player Name: <input ref="playername" type="text"/> <br/>
-						<button onClick={this.doConnect}>Connect</button>
+						<PlayerConnect doConnect={this.doConnect}/>
+						<UsersList label="Currently chatting:"
+ 						 connectedUsers={this.props.connectedUsers}/>
 					</div> :
 					<div>
-						<div style={{float: "left"}}>
-							Currently in chat:
-							<ul>
+						<UsersList label="Currently in chat:" 
+						style={{float: "left"}} 
+						connectedUsers={this.props.connectedUsers}/>
+						<div style={{marginLeft: "150px"}} ref="chat-div">
+							Connected as: {this.props.userName}
+							<ul ref="chat"
+							style={{minHeight: "200px", maxHeight: "200px", 
+							overflow: "auto"}}>
 							{
-								this.props.usersConnected.map((item, index) => {
+								this.props.chat.map((item, index) => {
 									return(
 										<li key={index}>
-											{item}
+											{item.userName}: {item.message}
 										</li>
 									);
 								})
 							}
 							</ul>
-						</div>
-						<div style={{marginLeft: "150px"}} ref="chat-div">
-							Connected as: {this.props.userName}
-							<ul>
-								{
-									this.props.chat.map((item, index) => {
-										return(
-											<li key={index}>
-												{item.userName}: {item.message}
-											</li>
-										);
-									})
-								}
-							</ul>
-							<textarea ref="message"/>
-							<button onClick={this.sendMessage}>Send</button>
+							<textarea style={{resize: "none"}}
+							onKeyUp={this.onKeyUp} ref="message"
+							placeholder="Say something!"/>
 						</div>
 					</div>
 				}
@@ -79,6 +84,10 @@ class FindMatch extends Component {
 
 /* Component properties */
 FindMatch.propTypes = {
+	isConnected: React.PropTypes.bool.isRequired,
+	userName: React.PropTypes.string.isRequired,
+	chat: React.PropTypes.array.isRequired,
+	connectedUsers: React.PropTypes.array.isRequired,
 	findMatch: React.PropTypes.func.isRequired,
 	setChat: React.PropTypes.func.isRequired
 }
@@ -89,7 +98,7 @@ function mapStateToProps(state) {
 		isConnected: state.findMatchState.isConnected,
 		userName: state.findMatchState.userName,
 		chat: state.chatState.chat,
-		usersConnected: state.chatState.usersConnected
+		connectedUsers: state.chatState.connectedUsers
 	};
 }
 

@@ -1,6 +1,12 @@
 /* eslint-disable global-require */
+let configureStore;
 if (process.env.NODE_ENV === 'production') {
-  module.exports = require('./configureStore.prod');
+  configureStore = require('./configureStore.prod');
 } else {
-  module.exports = require('./configureStore.dev');
+  configureStore = require('./configureStore.dev');
+}
+
+export default configureStore.default;
+export const configUtils = {
+	getState: configureStore.getState
 }
