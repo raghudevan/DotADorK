@@ -6,6 +6,41 @@ var DBUrl = 'mongodb://localhost:27017/DotaDork';
 
 var dbCon;
 
+function updateMatchState(matchId, match, cb) {
+	console.log("In updateMatch");
+	connect(DBUrl, function(res) {
+		if(res.success === true) {
+			dbCon=res.dbHandle;
+			getNextUnfilledMatch(function(match){
+				if(match === null) {
+					createMatch(playerId, function( res ) {
+						dbCon.close();
+						return cb(res);
+					});
+				}
+				else {
+					joinMatch(match, playerId, function( res ) {
+						dbCon.close();
+						return cb(res);
+					});
+				}
+			});
+		}
+		else {
+			return cb(res);
+		}
+	});
+}
+
+function updateMatch(matchId, match, cb) {
+	matchInventory.updateOne({matchId:matchId}, match, function(err, res) {
+		if (err) {
+			return cb({success: false, err: err});
+		} else {
+			return cb({success: true, match: match});
+		}
+    });
+}
 
 function createOrJoinMatch(playerId, cb) {
 	console.log("In createOrJoinMatch");
@@ -14,10 +49,16 @@ function createOrJoinMatch(playerId, cb) {
 			dbCon=res.dbHandle;
 			getNextUnfilledMatch(function(match){
 				if(match === null) {
-					createMatch(playerId, cb);
+					createMatch(playerId, function( res ) {
+						dbCon.close();
+						return cb(res);
+					});
 				}
 				else {
-					joinMatch(match, playerId, cb);
+					joinMatch(match, playerId, function( res ) {
+						dbCon.close();
+						return cb(res);
+					});
 				}
 			});
 		}
@@ -39,7 +80,8 @@ function getNextUnfilledMatch(cb) {
 function joinMatch(match, playerId, cb) {
 	console.log("In joinMatch");
 	var matchInventory = dbCon.collection('matchInventory');
-	match.players.push(playerId);
+	match.match.players.push(playerId);
+	match.match.chat.push(playerId+" joined the match.");
 	match.numberOfPlayers++;
 	
 	matchInventory.updateOne({matchId:match.matchId}, match, function(err, res) {
@@ -56,7 +98,11 @@ function createMatch(playerId, cb) {
 	var matchInventory = dbCon.collection('matchInventory');
 	var matchId = uuid.v1();
 	
-	var matchDocument = {matchId:matchId, players:[playerId], numberOfPlayers: 1};
+	var matchDocument = createInitalMatchObject();
+	
+	matchDocument.matchId=matchId;
+	matchDocument.match.players.push(playerId);
+	matchDocument.match.chat.push(playerId+" joined the match.");
 	
 	matchInventory.insert(matchDocument, function(err, records){
 		if (err) {
@@ -65,6 +111,16 @@ function createMatch(playerId, cb) {
 			return cb({success: true, match: matchDocument});
 		}
 	});
+}
+
+function createInitalMatchObject() {
+	return {
+		match: {
+			players: [],
+			chat: []
+		},
+		numberOfPlayers: 1
+	};
 }
 
 function connect(mongoUrl, cb) {
@@ -79,8 +135,10 @@ function connect(mongoUrl, cb) {
 	});
 }
 
-createOrJoinMatch("HavaH123", function(res) {
-	console.log(res);
-	dbCon.close();
-	return;
-});
+/*
+createOrJoinMatch("12344", function( res ) {
+	console.log(JSON.stringify(res));
+});*/
+
+exports.createOrJoinMatch=createOrJoinMatch;
+
